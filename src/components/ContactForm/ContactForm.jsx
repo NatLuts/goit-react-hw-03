@@ -1,27 +1,50 @@
-import { Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import { nanoid } from "nanoid";
+import s from "../Phonebook.module.css";
+import * as Yup from "yup";
 
-const ContactForm = () => {
+const ContactForm = ({ addContact }) => {
+  const addSchema = Yup.object().shape({
+    name: Yup.string()
+      .min(3, "Field must be more than 3")
+      .max(50)
+      .required("Required"),
+    number: Yup.string()
+      .min(3, "Field must be more than 3")
+      .max(50, "Field must be less than 50")
+      .required("Required"),
+  });
+
   const intialValues = {
     name: "",
     number: "",
   };
+
   const handleSubmit = (data, options) => {
-    console.log({ ...data, id: nanoid() });
+    addContact({ ...data, id: nanoid() });
     options.resetForm();
   };
+
   return (
-    <Formik initialValues={intialValues} onSubmit={handleSubmit}>
-      <Form>
+    <Formik
+      initialValues={intialValues}
+      onSubmit={handleSubmit}
+      validationSchema={addSchema}
+    >
+      <Form className={s.form}>
         <label>
           Name
-          <Field input type="text" name="name" />
+          <Field className={s.form_input} type="text" name="name" />
+          <ErrorMessage component="span" className={s.error} name="name" />
         </label>
         <label>
           Number
-          <Field input type="text" name="number" />
+          <Field className={s.form_input} type="text" name="number" />
+          <ErrorMessage component="span" className={s.error} name="number" />
         </label>
-        <button type="submit">Add contact</button>
+        <button className={s.add_btn} type="submit">
+          Add contact
+        </button>
       </Form>
     </Formik>
   );
